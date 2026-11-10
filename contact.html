@@ -38,7 +38,8 @@
         <div class="c-line"><span class="k">Follow</span><a class="v" href="https://www.linkedin.com/company/oobe-out-of-box-experience/" target="_blank" rel="noopener" style="text-decoration:none">LinkedIn ↗</a><span></span></div>
       </div>
     </div>
-    <form class="intake" novalidate data-mailto="info@oobe.ca">
+    <form class="intake" novalidate action="/api/contact" method="post" data-mailto="info@oobe.ca">
+      <div class="hp" aria-hidden="true"><label for="f-website">Leave this field empty</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
       <div class="f2">
         <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
         <div class="field"><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization"></div>
@@ -50,7 +51,7 @@
       <fieldset class="field"><legend>I'm interested in</legend><div class="pills" style="margin-top:8px"><input type="checkbox" id="opt-0" name="interest" value="IT consulting"><label for="opt-0">IT consulting</label><input type="checkbox" id="opt-1" name="interest" value="Cloud consulting"><label for="opt-1">Cloud consulting</label><input type="checkbox" id="opt-2" name="interest" value="Microsoft solutions"><label for="opt-2">Microsoft solutions</label><input type="checkbox" id="opt-3" name="interest" value="AI and governance"><label for="opt-3">AI and governance</label><input type="checkbox" id="opt-4" name="interest" value="Virtualization"><label for="opt-4">Virtualization</label><input type="checkbox" id="opt-5" name="interest" value="Backup and recovery"><label for="opt-5">Backup and recovery</label><input type="checkbox" id="opt-6" name="interest" value="Cyber awareness training"><label for="opt-6">Cyber awareness training</label><input type="checkbox" id="opt-7" name="interest" value="Cloud IP Phone"><label for="opt-7">Cloud IP Phone</label><input type="checkbox" id="opt-8" name="interest" value="Not sure yet"><label for="opt-8">Not sure yet</label></div></fieldset>
       <div class="field"><label for="f-msg">How can we help?</label><textarea id="f-msg" name="message" placeholder="A sentence or two about your setup and what you'd like to change."></textarea></div>
       <div><button class="btn btn-primary" type="submit">Send message <span class="arr">→</span></button></div>
-      <p class="form-note" tabindex="-1" hidden>Your email app should open with your message ready to send. If it doesn't, email info@oobe.ca or call +1 (647) 825-2552.</p>
+      <p class="form-note" tabindex="-1" role="status" aria-live="polite" hidden></p>
     </form>
   </div>
 </div></section>

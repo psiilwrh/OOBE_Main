@@ -479,6 +479,12 @@ fieldset.field { border: 0; margin: 0; padding: 0; }
 .pills input:checked + label { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .pills input:focus-visible + label { outline: 2px solid var(--orange); outline-offset: 2px; }
 .form-note { font-size: 14px; color: var(--muted); border-left: 2px solid var(--orange); padding-left: 12px; }
+.form-note.success { color: var(--ink); border-left-color: var(--ok); }
+.form-note.error { color: var(--ink); border-left-color: var(--orange-text); }
+.form-note a { color: inherit; }
+form.intake button[disabled] { opacity: .65; cursor: progress; }
+/* honeypot: hidden from people, visible to bots */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
 
 /* ===== TILE SYSTEM ===== */

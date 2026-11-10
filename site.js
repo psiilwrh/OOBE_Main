@@ -343,19 +343,55 @@
     });
   });
 
-  /* ---------- intake form (preview: not connected yet) ---------- */
+  /* ---------- intake form: sends to /api/contact, email app only as a fallback ---------- */
   var form = document.querySelector('form.intake');
   if (form) form.addEventListener('submit', function (e) {
     e.preventDefault();
     var note = form.querySelector('.form-note');
-    var to = form.getAttribute('data-mailto');
-    if (to) {
-      var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
-      var picks = Array.prototype.map.call(form.querySelectorAll('input[name="interest"]:checked'), function (i) { return i.value; }).join(', ');
-      var bodyText = 'Name: ' + v('name') + '\nCompany: ' + v('company') + '\nEmail: ' + v('email') + '\nPhone: ' + v('phone') + '\nInterested in: ' + (picks || 'Not specified') + '\n\n' + v('message');
-      window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('Consultation request from ' + (v('name') || 'oobe.ca')) + '&body=' + encodeURIComponent(bodyText);
-    }
-    if (note) { note.hidden = false; note.focus(); }
+    var btn = form.querySelector('button[type="submit"]');
+    var to = form.getAttribute('data-mailto') || 'info@oobe.ca';
+    var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ''; };
+    var picks = Array.prototype.map.call(form.querySelectorAll('input[name="interest"]:checked'), function (i) { return i.value; });
+
+    var show = function (html, kind) {
+      if (!note) return;
+      note.innerHTML = html;
+      note.className = 'form-note' + (kind ? ' ' + kind : '');
+      note.hidden = false; note.focus();
+    };
+    var mailtoHref = function () {
+      var bodyText = 'Name: ' + v('name') + '\nCompany: ' + v('company') + '\nEmail: ' + v('email') + '\nPhone: ' + v('phone') + '\nInterested in: ' + (picks.join(', ') || 'Not specified') + '\n\n' + v('message');
+      return 'mailto:' + to + '?subject=' + encodeURIComponent('Consultation request from ' + (v('name') || 'oobe.ca')) + '&body=' + encodeURIComponent(bodyText);
+    };
+
+    // light client-side checks (the server checks again)
+    var nameEl = form.querySelector('[name="name"]'), emailEl = form.querySelector('[name="email"]');
+    if (!v('name')) { show('Please add your name.', 'error'); if (nameEl) nameEl.focus(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) { show('Please add a valid email address so we can reply.', 'error'); if (emailEl) emailEl.focus(); return; }
+
+    var payload = { name: v('name'), company: v('company'), email: v('email'), phone: v('phone'), message: v('message'), interest: picks, website: v('website') };
+    var label = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+    var restore = function () { if (btn) { btn.disabled = false; btn.innerHTML = label; } };
+    var fail = function () {
+      restore();
+      show('We couldn’t send your message just now. Please <a href="' + mailtoHref() + '">send it by email instead</a>, write to <a href="mailto:' + to + '">' + to + '</a> or call <a href="tel:+16478252552">+1 (647) 825-2552</a>.', 'error');
+    };
+
+    fetch(form.getAttribute('action') || '/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('status ' + r.status);
+      return r.json();
+    }).then(function (data) {
+      if (!data || !data.ok) throw new Error('not ok');
+      form.reset();
+      restore();
+      show('Thank you, ' + (payload.name.split(' ')[0] || 'we got it').replace(/[<>&]/g, '') + '. Your message is with our team and we’ll be in touch shortly to set up your consultation.', 'success');
+    }).catch(fail);
   });
 
   /* pause SMIL packets for reduced motion */
