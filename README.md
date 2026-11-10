@@ -24,3 +24,10 @@ Vercel environment variables:
 - `CONTACT_FROM` (optional): sender, default `OOBE Website <website@oobe.ca>`
 
 Includes a hidden honeypot field for spam. If sending fails, the visitor is offered email and phone instead.
+
+## Structured data (SEO and AI search)
+Each page carries one JSON-LD block, generated from the page content by `scripts/schema.py`:
+Organization (ProfessionalService), WebSite, WebPage/AboutPage/ContactPage/CollectionPage, breadcrumbs,
+the 8 services, Cloud IP Phone with its plans, and FAQPage for every FAQ section.
+
+After editing FAQs, services or plans, run `python3 scripts/schema.py` and commit the result.
