@@ -37,3 +37,4 @@ After editing FAQs, services or plans, run `python3 scripts/schema.py` and commi
 - `images/oobe-logo.png` (1200x400) and `images/oobe-mark-512.png`: raster logos for Google and other platforms
 
 Files in `/images` are cached for a year (`vercel.json`), so give a changed image a new file name.
+- Icons: `favicon.ico` (16/32/48), `favicon.svg`, `images/favicon-96.png`, `apple-touch-icon.png` (180), `images/icon-192.png` and `images/icon-512.png` (referenced by `site.webmanifest`), all from the orange OOBE mark

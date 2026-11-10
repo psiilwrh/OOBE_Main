@@ -1,0 +1,29 @@
+{
+  "name": "OOBE | Out of Box Experience Inc.",
+  "short_name": "OOBE",
+  "description": "IT, cloud, AI and unified communications in Toronto, serving Canada and the US.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#F4F4F2",
+  "theme_color": "#0E2A47",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
