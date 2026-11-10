@@ -21,7 +21,8 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://www.oobe.ca"
 ORG_ID = SITE + "/#organization"
 WEBSITE_ID = SITE + "/#website"
-LOGO = SITE + "/logo.svg"
+LOGO = SITE + "/images/oobe-logo.png"
+SOCIAL_IMAGE = SITE + "/images/oobe-og.png"
 MARK = "<!-- schema.py: generated structured data, do not edit by hand -->"
 
 AREA = [
@@ -97,8 +98,8 @@ def organization(service_list):
         "name": "Out of Box Experience Inc.",
         "alternateName": ["OOBE", "Out of Box Experience", "OOBE.CA"],
         "url": SITE + "/",
-        "logo": {"@type": "ImageObject", "@id": SITE + "/#logo", "url": LOGO, "contentUrl": LOGO, "caption": "OOBE"},
-        "image": {"@id": SITE + "/#logo"},
+        "logo": {"@type": "ImageObject", "@id": SITE + "/#logo", "url": LOGO, "contentUrl": LOGO, "width": 1200, "height": 400, "caption": "OOBE"},
+        "image": [{"@id": SITE + "/#logo"}, {"@type": "ImageObject", "url": SOCIAL_IMAGE, "width": 1200, "height": 630}],
         "slogan": "Technology that works out of the box.",
         "description": (
             "Out of Box Experience Inc. (OOBE) is a Canadian IT, cloud, AI and unified communications company "
@@ -158,6 +159,7 @@ def webpage(url, page_html, kind="WebPage", crumb=None):
         "isPartOf": {"@id": WEBSITE_ID},
         "about": {"@id": ORG_ID},
         "publisher": {"@id": ORG_ID},
+        "primaryImageOfPage": {"@type": "ImageObject", "url": SOCIAL_IMAGE, "width": 1200, "height": 630},
     }
     if crumb:
         node["breadcrumb"] = {"@id": url + "#breadcrumb"}

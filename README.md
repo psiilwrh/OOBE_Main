@@ -31,3 +31,9 @@ Organization (ProfessionalService), WebSite, WebPage/AboutPage/ContactPage/Colle
 the 8 services, Cloud IP Phone with its plans, and FAQPage for every FAQ section.
 
 After editing FAQs, services or plans, run `python3 scripts/schema.py` and commit the result.
+
+## Images
+- `images/oobe-og.png` (1200x630): preview image for links shared on LinkedIn, Teams, WhatsApp, etc. and for AI citations
+- `images/oobe-logo.png` (1200x400) and `images/oobe-mark-512.png`: raster logos for Google and other platforms
+
+Files in `/images` are cached for a year (`vercel.json`), so give a changed image a new file name.
