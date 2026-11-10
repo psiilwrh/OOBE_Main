@@ -1,0 +1,28 @@
+# OOBE (Out of Box Experience Inc.)
+
+> Toronto-based IT, cloud, AI and unified communications company serving clients across Canada and the United States. Consulting, implementation and ongoing support from one senior team.
+
+## Services
+- IT consulting: systems design and architecture, deployment and integration, troubleshooting and root-cause analysis, documentation
+- Cloud consulting: IaaS, PaaS and SaaS design, migration planning and execution, optimization and governance, multi-cloud and hybrid
+- Microsoft solutions: Microsoft 365, Azure, Dynamics 365, Exchange Online and hybrid, security hardening, licensing and governance
+- AI consulting, implementation and governance: readiness and roadmap, Microsoft Copilot and agent rollout, AI policy definition, governance and risk controls
+- Virtualization and hypervisors: VMware and Hyper-V design, migration, optimization and monitoring
+- Backup and disaster recovery: on-prem and cloud backup, Microsoft 365 data protection, DR planning, drill testing
+- End-user training and cyber awareness: phishing and social engineering, security hygiene, policy and culture
+- Unified communications: Cloud IP Phone (cloud VoIP, hosted PBX), Microsoft Teams Direct Routing, SMS and fax in Teams, AI contact centre, SIP trunking, number porting
+
+## Cloud IP Phone
+Cloud VoIP business phone system hosted in Canada with active-active failover, managed 24/7, AI transcripts and summaries, NG911 included. Per-user plans: Bronze, Silver, Gold AI.
+
+## Contact
+- Phone: +1 (647) 825-2552
+- Email: info@oobe.ca
+- Location: Toronto, Ontario. Serving Canada and the United States.
+
+## Pages
+- https://www.oobe.ca/
+- https://www.oobe.ca/services
+- https://www.oobe.ca/cloud-ip-phone
+- https://www.oobe.ca/about
+- https://www.oobe.ca/contact
