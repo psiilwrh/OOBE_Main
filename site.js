@@ -345,6 +345,23 @@
 
   /* ---------- intake form: sends to /api/contact, email app only as a fallback ---------- */
   var form = document.querySelector('form.intake');
+
+  // Cloudflare Turnstile: rendered explicitly so we keep the widget id and can reset it,
+  // because each token works once. api.js calls oobeTurnstileReady when it has loaded.
+  var tsBox = form ? form.querySelector('.cf-turnstile') : null;
+  var tsId = null;
+  window.oobeTurnstileReady = function () {
+    if (!tsBox || !window.turnstile || tsId !== null) return;
+    var t = document.documentElement.getAttribute('data-theme');
+    tsId = window.turnstile.render(tsBox, {
+      sitekey: tsBox.getAttribute('data-sitekey'),
+      action: tsBox.getAttribute('data-action') || 'contact',
+      size: tsBox.getAttribute('data-size') || 'flexible',
+      theme: t === 'light' || t === 'dark' ? t : 'auto'
+    });
+  };
+  if (window.turnstile) window.oobeTurnstileReady();
+
   if (form) form.addEventListener('submit', function (e) {
     e.preventDefault();
     var note = form.querySelector('.form-note');
@@ -369,13 +386,13 @@
     if (!v('name')) { show('Please add your name.', 'error'); if (nameEl) nameEl.focus(); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) { show('Please add a valid email address so we can reply.', 'error'); if (emailEl) emailEl.focus(); return; }
 
-    // Cloudflare Turnstile: the widget adds a hidden token field once the visitor passes the check
-    var hasWidget = !!form.querySelector('.cf-turnstile');
-    var token = v('cf-turnstile-response');
-    if (hasWidget && window.turnstile && !token) { show('Please wait a moment for the security check above the button to finish, then send again.', 'error'); return; }
-    var resetCheck = function () { try { if (hasWidget && window.turnstile) window.turnstile.reset(); } catch (err) {} };
+    // Turnstile token: empty until the check above the button has passed
+    var token = '';
+    try { if (tsId !== null && window.turnstile) token = window.turnstile.getResponse(tsId) || ''; } catch (err) {}
+    if (tsId !== null && !token) { show('Please wait a moment for the security check above the button to finish, then send again.', 'error'); return; }
+    var resetCheck = function () { try { if (tsId !== null && window.turnstile) window.turnstile.reset(tsId); } catch (err) {} };
 
-    var payload = { name: v('name'), company: v('company'), email: v('email'), phone: v('phone'), message: v('message'), interest: picks, website: v('website'), token: token };
+    var payload = { name: v('name'), company: v('company'), email: v('email'), phone: v('phone'), message: v('message'), interest: picks, website: v('website'), 'cf-turnstile-response': token };
     var label = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 

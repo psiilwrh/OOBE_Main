@@ -7,9 +7,10 @@
  *   CONTACT_TO       optional. Inbox that receives requests (default info@oobe.ca)
  *   CONTACT_FROM     optional. Sender on a domain verified in Resend
  *                    (default "OOBE Website <website@oobe.ca>")
- *   TURNSTILE_SECRET_KEY  secret key of the Cloudflare Turnstile widget. When set, every
- *                    request must carry a valid Turnstile token. When missing, the check is
- *                    skipped and a warning is logged, so set it in Production.
+ *   TURNSTILE_SECRET_KEY  required. Secret key of the Cloudflare Turnstile widget. Without it
+ *                    the form answers 503 and sends nothing.
+ *   TURNSTILE_HOSTNAMES   optional. Comma separated hostnames a token may come from
+ *                    (default "oobe.ca,www.oobe.ca"). Never list localhost in Production.
  *
  * Spam protection, in order: per-address rate limit, honeypot field, Turnstile token check.
  */
@@ -39,16 +40,35 @@ function rateLimited(ip) {
   return false;
 }
 
-// Returns true when Cloudflare confirms the token. Tokens are single use and expire after 5 minutes.
+const TURNSTILE_ACTION = 'contact';
+
+// Returns true only when Cloudflare confirms the token for this form and this site.
+// Anything else (bad token, timeout, network error, odd response) counts as a failure.
+// Tokens are single use and expire after 5 minutes.
 async function verifyTurnstile(secret, token, ip) {
-  if (!token) return false;
+  if (typeof token !== 'string' || !token || token.length > 2048) return false;
+  const allowed = (process.env.TURNSTILE_HOSTNAMES || 'oobe.ca,www.oobe.ca')
+    .split(',').map((h) => h.trim().toLowerCase()).filter(Boolean);
   try {
     const params = new URLSearchParams({ secret, response: token });
     if (ip) params.set('remoteip', ip);
-    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: params });
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: params,
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!r.ok) { console.error('contact: Turnstile siteverify status', r.status); return false; }
     const out = await r.json();
-    if (!out.success) console.warn('contact: Turnstile rejected', (out['error-codes'] || []).join(','));
-    return out.success === true;
+    if (!out || out.success !== true) {
+      console.warn('contact: Turnstile rejected', ((out && out['error-codes']) || []).join(','));
+      return false;
+    }
+    if (out.action !== TURNSTILE_ACTION) { console.warn('contact: Turnstile action mismatch', out.action); return false; }
+    if (!allowed.includes(String(out.hostname || '').toLowerCase())) {
+      console.warn('contact: Turnstile hostname not allowed', out.hostname);
+      return false;
+    }
+    return true;
   } catch (err) {
     console.error('contact: Turnstile check failed', err && err.message);
     return false;
@@ -97,11 +117,12 @@ module.exports = async function handler(req, res) {
   if (clean(body.website, 200)) return res.status(200).json({ ok: true });
 
   const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-  if (turnstileSecret) {
-    const human = await verifyTurnstile(turnstileSecret, clean(body.token, 4096), ip);
-    if (!human) return res.status(403).json({ ok: false, error: 'verification_failed' });
-  } else {
-    console.warn('contact: TURNSTILE_SECRET_KEY is not set, skipping the Turnstile check');
+  if (!turnstileSecret) {
+    console.error('contact: TURNSTILE_SECRET_KEY is not set');
+    return res.status(503).json({ ok: false, error: 'not_configured' });
+  }
+  if (!(await verifyTurnstile(turnstileSecret, body['cf-turnstile-response'], ip))) {
+    return res.status(403).json({ ok: false, error: 'verification_failed' });
   }
 
   const interests = Array.isArray(body.interest) ? body.interest : body.interest ? [body.interest] : [];
