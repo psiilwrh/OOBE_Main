@@ -544,3 +544,4 @@ canvas.tilefield { display: block; width: 100%; aspect-ratio: 1 / 1; border-radi
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+.cf-turnstile { min-height: 65px; }

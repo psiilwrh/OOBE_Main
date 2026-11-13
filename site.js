@@ -369,13 +369,19 @@
     if (!v('name')) { show('Please add your name.', 'error'); if (nameEl) nameEl.focus(); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) { show('Please add a valid email address so we can reply.', 'error'); if (emailEl) emailEl.focus(); return; }
 
-    var payload = { name: v('name'), company: v('company'), email: v('email'), phone: v('phone'), message: v('message'), interest: picks, website: v('website') };
+    // Cloudflare Turnstile: the widget adds a hidden token field once the visitor passes the check
+    var hasWidget = !!form.querySelector('.cf-turnstile');
+    var token = v('cf-turnstile-response');
+    if (hasWidget && window.turnstile && !token) { show('Please wait a moment for the security check above the button to finish, then send again.', 'error'); return; }
+    var resetCheck = function () { try { if (hasWidget && window.turnstile) window.turnstile.reset(); } catch (err) {} };
+
+    var payload = { name: v('name'), company: v('company'), email: v('email'), phone: v('phone'), message: v('message'), interest: picks, website: v('website'), token: token };
     var label = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 
     var restore = function () { if (btn) { btn.disabled = false; btn.innerHTML = label; } };
     var fail = function () {
-      restore();
+      restore(); resetCheck();
       show('We couldn’t send your message just now. Please <a href="' + mailtoHref() + '">send it by email instead</a>, write to <a href="mailto:' + to + '">' + to + '</a> or call <a href="tel:+16478252552">+1 (647) 825-2552</a>.', 'error');
     };
 
@@ -389,7 +395,7 @@
     }).then(function (data) {
       if (!data || !data.ok) throw new Error('not ok');
       form.reset();
-      restore();
+      restore(); resetCheck();
       show('Thank you, ' + (payload.name.split(' ')[0] || 'we got it').replace(/[<>&]/g, '') + '. Your message is with our team and we’ll be in touch shortly to set up your consultation.', 'success');
     }).catch(fail);
   });

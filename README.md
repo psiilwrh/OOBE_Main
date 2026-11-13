@@ -22,8 +22,9 @@ Vercel environment variables:
 - `RESEND_API_KEY` (required): API key from resend.com, with oobe.ca verified as a sending domain
 - `CONTACT_TO` (optional): inbox for requests, default `info@oobe.ca`
 - `CONTACT_FROM` (optional): sender, default `OOBE Website <website@oobe.ca>`
+- `TURNSTILE_SECRET_KEY`: secret key of the Cloudflare Turnstile widget. Without it the server skips the Turnstile check
 
-Includes a hidden honeypot field for spam. If sending fails, the visitor is offered email and phone instead.
+Spam protection: Cloudflare Turnstile (widget in `contact.html`, token verified in `api/contact.js`), a hidden honeypot field and a best effort rate limit of 5 requests per address per 10 minutes. The Turnstile site key is the `data-sitekey` attribute in `contact.html`. If sending fails, the visitor is offered email and phone instead.
 
 ## Structured data (SEO and AI search)
 Each page carries one JSON-LD block, generated from the page content by `scripts/schema.py`:
